@@ -1,55 +1,71 @@
-// script.js
-const board = document.getElementById('board');
-const status = document.getElementById('status');
-const resetBtn = document.getElementById('reset');
+const player1Input = document.getElementById('player-1');
+const player2Input = document.getElementById('player-2');
+const submitBtn = document.getElementById('submit');
+const setupDiv = document.querySelector('.setup');
+const gameDiv = document.querySelector('.game');
+const messageDiv = document.querySelector('.message');
+const boardDiv = document.querySelector('.board');
 
-let currentPlayer = 'X';
-let gameState = Array(9).fill(null);
-let gameActive = true;
+let players = [];
+let currentPlayer = 0;
+let boardState = Array(9).fill(null);
+let gameOver = false;
 
-const winningCombos = [
-  [0,1,2], [3,4,5], [6,7,8], // rows
-  [0,3,6], [1,4,7], [2,5,8], // columns
-  [0,4,8], [2,4,6]           // diagonals
-];
+submitBtn.addEventListener('click', () => {
+  const name1 = player1Input.value.trim();
+  const name2 = player2Input.value.trim();
 
-function checkWinner() {
-  for (let combo of winningCombos) {
-    const [a, b, c] = combo;
-    if (gameState[a] && gameState[a] === gameState[b] && gameState[a] === gameState[c]) {
-      status.textContent = Player ${gameState[a]} wins! 🎉;
-      gameActive = false;
-      return;
-    }
+  if (!name1 || !name2) {
+    alert('Please enter both player names.');
+    return;
   }
 
-  if (!gameState.includes(null)) {
-    status.textContent = "It's a draw!";
-    gameActive = false;
-  }
-}
+  players = [name1, name2];
+  setupDiv.style.display = 'none';
+  gameDiv.style.display = 'block';
+  messageDiv.textContent = `${players[currentPlayer]}, you're up`;
 
-function handleClick(e) {
-  const index = e.target.dataset.index;
-  if (!gameActive || gameState[index]) return;
+  createBoard();
+});
 
-  gameState[index] = currentPlayer;
-  e.target.textContent = currentPlayer;
-  checkWinner();
-
-  if (gameActive) {
-    currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
-    status.textContent = Player ${currentPlayer}'s turn;
+function createBoard() {
+  boardDiv.innerHTML = '';
+  for (let i = 0; i < 9; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+    cell.id = i + 1;
+    cell.addEventListener('click', () => handleMove(i, cell));
+    boardDiv.appendChild(cell);
   }
 }
 
-function resetGame() {
-  gameState.fill(null);
-  currentPlayer = 'X';
-  gameActive = true;
-  status.textContent = Player ${currentPlayer}'s turn;
-  document.querySelectorAll('.cell').forEach(cell => cell.textContent = '');
+function handleMove(index, cell) {
+  if (boardState[index] || gameOver) return;
+
+  const symbol = currentPlayer === 0 ? 'X' : 'O';
+  boardState[index] = symbol;
+  cell.textContent = symbol;
+
+  if (checkWin(symbol)) {
+    messageDiv.textContent = `${players[currentPlayer]}, congratulations you won!`;
+    gameOver = true;
+  } else if (boardState.every(cell => cell)) {
+    messageDiv.textContent = `It's a draw!`;
+    gameOver = true;
+  } else {
+    currentPlayer = 1 - currentPlayer;
+    messageDiv.textContent = `${players[currentPlayer]}, you're up`;
+  }
 }
 
-board.addEventListener('click', handleClick);
-resetBtn.addEventListener('click', resetGame);
+function checkWin(symbol) {
+  const winPatterns = [
+    [0,1,2], [3,4,5], [6,7,8], // rows
+    [0,3,6], [1,4,7], [2,5,8], // columns
+    [0,4,8], [2,4,6]           // diagonals
+  ];
+
+  return winPatterns.some(pattern =>
+    pattern.every(index => boardState[index] === symbol)
+  );
+}
