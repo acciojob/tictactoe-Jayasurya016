@@ -1,12 +1,13 @@
-let player1, player2, currentPlayer, currentSymbol;
+    let player1, player2, currentPlayer, currentSymbol;
     let board = [];
     let gameActive = false;
 
     document.getElementById("submit").addEventListener("click", startGame);
 
     function startGame() {
-      player1 = document.getElementById("player-1").value || "Player 1";
-      player2 = document.getElementById("player-2").value || "Player 2";
+      // ✅ FIXED getElementById
+      player1 = document.getElementById("player1").value || "Player 1";
+      player2 = document.getElementById("player2").value || "Player 2";
       currentPlayer = player1;
       currentSymbol = "X";
       board = ["", "", "", "", "", "", "", "", ""];
