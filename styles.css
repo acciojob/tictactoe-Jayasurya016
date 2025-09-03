@@ -1,4 +1,4 @@
- body {
+body {
       font-family: Arial, sans-serif;
       text-align: center;
       background: #f9f9f9;
@@ -45,13 +45,11 @@
       font-size: 32px;
       font-weight: bold;
       cursor: pointer;
-		border: solid black;
     }
 
     .cell.winner {
       background: purple;
       color: white;
-		border: solid black;
     }
 
     .message {
