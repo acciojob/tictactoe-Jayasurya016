@@ -45,11 +45,13 @@
       font-size: 32px;
       font-weight: bold;
       cursor: pointer;
+		border: solid black;
     }
 
     .cell.winner {
       background: purple;
       color: white;
+		border: solid black;
     }
 
     .message {
