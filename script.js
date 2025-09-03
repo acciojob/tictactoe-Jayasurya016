@@ -1,76 +1,56 @@
 //your JS code here. If required.
-const submitBtn = document.getElementById("submit");
-    const playerInputs = document.getElementById("player-inputs");
-    const board = document.getElementById("board");
-    const message = document.querySelector(".message");
-    const cells = document.querySelectorAll(".cell");
+let player1, player2, currentPlayer, currentSymbol;
+    let board = [];
+    let gameActive = false;
 
-    let player1 = "";
-    let player2 = "";
-    let currentPlayer = "";
-    let currentSymbol = "X";
-    let gameActive = true;
-
-    const winningCombos = [
-      [1,2,3], [4,5,6], [7,8,9], // rows
-      [1,4,7], [2,5,8], [3,6,9], // cols
-      [1,5,9], [3,5,7]           // diagonals
-    ];
-
-    submitBtn.addEventListener("click", () => {
-      const p1 = document.getElementById("player-1").value.trim();
-      const p2 = document.getElementById("player-2").value.trim();
-
-      if (!p1 || !p2) {
-        alert("Please enter names for both players!");
-        return;
-      }
-
-      player1 = p1;
-      player2 = p2;
+    function startGame() {
+      player1 = document.getElementById("player1").value || "Player 1";
+      player2 = document.getElementById("player2").value || "Player 2";
       currentPlayer = player1;
+      currentSymbol = "X";
+      board = ["", "", "", "", "", "", "", "", ""];
+      gameActive = true;
 
-      playerInputs.style.display = "none";
-      board.style.display = "block";
-      message.textContent = `${currentPlayer}, you're up`;
-    });
-
-    function checkWin() {
-      return winningCombos.some(combo => {
-        const [a,b,c] = combo;
-        return (
-          document.getElementById(a).textContent === currentSymbol &&
-          document.getElementById(b).textContent === currentSymbol &&
-          document.getElementById(c).textContent === currentSymbol
-        );
-      });
+      document.getElementById("message").innerText = `${currentPlayer}, you're up`;
+      drawBoard();
     }
 
-    function checkDraw() {
-      return [...cells].every(cell => cell.textContent !== "");
+    function drawBoard() {
+      const boardDiv = document.getElementById("board");
+      boardDiv.innerHTML = "";
+      for (let i = 0; i < 9; i++) {
+        const cell = document.createElement("div");
+        cell.classList.add("cell");
+        cell.setAttribute("data-index", i);
+        cell.innerText = board[i];
+        cell.onclick = () => makeMove(i);
+        boardDiv.appendChild(cell);
+      }
     }
 
-    function handleClick(e) {
-      if (!gameActive) return;
+    function makeMove(index) {
+      if (!gameActive || board[index] !== "") return;
 
-      const cell = e.target;
-      if (cell.textContent !== "") return;
+      board[index] = currentSymbol;
+      drawBoard();
 
-      cell.textContent = currentSymbol;
-      cell.classList.add("taken");
-
-      if (checkWin()) {
-        message.textContent = `${currentPlayer}, congratulations you won!`;
+      if (checkWinner()) {
+        document.getElementById("message").innerText = `${currentPlayer}, congratulations you won! 🎉`;
+        highlightWinningCells(checkWinner());
         gameActive = false;
         return;
       }
 
-      if (checkDraw()) {
-        message.textContent = "It's a draw!";
+      if (!board.includes("")) {
+        document.getElementById("message").innerText = "It's a draw!";
         gameActive = false;
         return;
       }
 
+      switchPlayer();
+    }
+
+    function switchPlayer() {
       if (currentPlayer === player1) {
         currentPlayer = player2;
         currentSymbol = "O";
@@ -78,10 +58,33 @@ const submitBtn = document.getElementById("submit");
         currentPlayer = player1;
         currentSymbol = "X";
       }
-
-      message.textContent = `${currentPlayer}, you're up`;
+      document.getElementById("message").innerText = `${currentPlayer}, you're up`;
     }
 
-    cells.forEach(cell => {
-      cell.addEventListener("click", handleClick);
-    });
+    function checkWinner() {
+      const winningCombos = [
+        [0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8],
+        [0, 3, 6],
+        [1, 4, 7],
+        [2, 5, 8],
+        [0, 4, 8],
+        [2, 4, 6],
+      ];
+
+      for (let combo of winningCombos) {
+        const [a, b, c] = combo;
+        if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+          return combo;
+        }
+      }
+      return null;
+    }
+
+    function highlightWinningCells(cells) {
+      const boardDiv = document.getElementById("board").children;
+      cells.forEach(i => {
+        boardDiv[i].classList.add("winner");
+      });
+    }
