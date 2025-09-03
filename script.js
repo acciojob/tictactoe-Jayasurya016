@@ -1,92 +1,55 @@
-    let player1, player2, currentPlayer, currentSymbol;
-    let board = [];
-    let gameActive = false;
+// script.js
+const board = document.getElementById('board');
+const status = document.getElementById('status');
+const resetBtn = document.getElementById('reset');
 
-    document.getElementById("submit").addEventListener("click", startGame);
+let currentPlayer = 'X';
+let gameState = Array(9).fill(null);
+let gameActive = true;
 
-    function startGame() {
-      // ✅ FIXED getElementById
-      player1 = document.getElementById("player1").value || "Player 1";
-      player2 = document.getElementById("player2").value || "Player 2";
-      currentPlayer = player1;
-      currentSymbol = "X";
-      board = ["", "", "", "", "", "", "", "", ""];
-      gameActive = true;
+const winningCombos = [
+  [0,1,2], [3,4,5], [6,7,8], // rows
+  [0,3,6], [1,4,7], [2,5,8], // columns
+  [0,4,8], [2,4,6]           // diagonals
+];
 
-      document.querySelector(".message").innerText = `${currentPlayer}, you're up`;
-      drawBoard();
+function checkWinner() {
+  for (let combo of winningCombos) {
+    const [a, b, c] = combo;
+    if (gameState[a] && gameState[a] === gameState[b] && gameState[a] === gameState[c]) {
+      status.textContent = Player ${gameState[a]} wins! 🎉;
+      gameActive = false;
+      return;
     }
+  }
 
-    function drawBoard() {
-      const boardDiv = document.getElementById("board");
-      boardDiv.innerHTML = "";
-      for (let i = 0; i < 9; i++) {
-        const cell = document.createElement("div");
-        cell.classList.add("cell");
-        cell.id = i + 1; // cells id = 1,2,3...
-        cell.innerText = board[i];
-        cell.onclick = () => makeMove(i);
-        boardDiv.appendChild(cell);
-      }
-    }
+  if (!gameState.includes(null)) {
+    status.textContent = "It's a draw!";
+    gameActive = false;
+  }
+}
 
-    function makeMove(index) {
-      if (!gameActive || board[index] !== "") return;
+function handleClick(e) {
+  const index = e.target.dataset.index;
+  if (!gameActive || gameState[index]) return;
 
-      board[index] = currentSymbol;
-      drawBoard();
+  gameState[index] = currentPlayer;
+  e.target.textContent = currentPlayer;
+  checkWinner();
 
-      if (checkWinner()) {
-        document.querySelector(".message").innerText = `${currentPlayer}, congratulations you won!`;
-        highlightWinningCells(checkWinner());
-        gameActive = false;
-        return;
-      }
+  if (gameActive) {
+    currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+    status.textContent = Player ${currentPlayer}'s turn;
+  }
+}
 
-      if (!board.includes("")) {
-        document.querySelector(".message").innerText = "It's a draw!";
-        gameActive = false;
-        return;
-      }
+function resetGame() {
+  gameState.fill(null);
+  currentPlayer = 'X';
+  gameActive = true;
+  status.textContent = Player ${currentPlayer}'s turn;
+  document.querySelectorAll('.cell').forEach(cell => cell.textContent = '');
+}
 
-      switchPlayer();
-    }
-
-    function switchPlayer() {
-      if (currentPlayer === player1) {
-        currentPlayer = player2;
-        currentSymbol = "O";
-      } else {
-        currentPlayer = player1;
-        currentSymbol = "X";
-      }
-      document.querySelector(".message").innerText = `${currentPlayer}, you're up`;
-    }
-
-    function checkWinner() {
-      const winningCombos = [
-        [0, 1, 2],
-        [3, 4, 5],
-        [6, 7, 8],
-        [0, 3, 6],
-        [1, 4, 7],
-        [2, 5, 8],
-        [0, 4, 8],
-        [2, 4, 6],
-      ];
-
-      for (let combo of winningCombos) {
-        const [a, b, c] = combo;
-        if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-          return combo;
-        }
-      }
-      return null;
-    }
-
-    function highlightWinningCells(cells) {
-      const boardDiv = document.getElementById("board").children;
-      cells.forEach(i => {
-        boardDiv[i].classList.add("winner");
-      });
-    }
+board.addEventListener('click', handleClick);
+resetBtn.addEventListener('click', resetGame);
