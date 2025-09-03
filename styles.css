@@ -24,10 +24,8 @@
       font-size: 14px;
       cursor: pointer;
       margin-top: 10px;
-      border: none;
-      border-radius: 5px;
-      background: #333;
-      color: white;
+      border: 1px solid #000;
+      background: white;
     }
 
     #board {
@@ -54,7 +52,7 @@
       color: white;
     }
 
-    #message {
+    .message {
       font-size: 18px;
       margin-top: 15px;
     }

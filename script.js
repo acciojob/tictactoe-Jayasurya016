@@ -1,17 +1,18 @@
-//your JS code here. If required.
 let player1, player2, currentPlayer, currentSymbol;
     let board = [];
     let gameActive = false;
 
+    document.getElementById("submit").addEventListener("click", startGame);
+
     function startGame() {
-      player1 = document.getElementById("player1").value || "Player 1";
-      player2 = document.getElementById("player2").value || "Player 2";
+      player1 = document.getElementById("player-1").value || "Player 1";
+      player2 = document.getElementById("player-2").value || "Player 2";
       currentPlayer = player1;
       currentSymbol = "X";
       board = ["", "", "", "", "", "", "", "", ""];
       gameActive = true;
 
-      document.getElementById("message").innerText = `${currentPlayer}, you're up`;
+      document.querySelector(".message").innerText = `${currentPlayer}, you're up`;
       drawBoard();
     }
 
@@ -21,7 +22,7 @@ let player1, player2, currentPlayer, currentSymbol;
       for (let i = 0; i < 9; i++) {
         const cell = document.createElement("div");
         cell.classList.add("cell");
-        cell.setAttribute("data-index", i);
+        cell.id = i + 1; // cells id = 1,2,3...
         cell.innerText = board[i];
         cell.onclick = () => makeMove(i);
         boardDiv.appendChild(cell);
@@ -35,14 +36,14 @@ let player1, player2, currentPlayer, currentSymbol;
       drawBoard();
 
       if (checkWinner()) {
-        document.getElementById("message").innerText = `${currentPlayer}, congratulations you won! 🎉`;
+        document.querySelector(".message").innerText = `${currentPlayer}, congratulations you won!`;
         highlightWinningCells(checkWinner());
         gameActive = false;
         return;
       }
 
       if (!board.includes("")) {
-        document.getElementById("message").innerText = "It's a draw!";
+        document.querySelector(".message").innerText = "It's a draw!";
         gameActive = false;
         return;
       }
@@ -58,7 +59,7 @@ let player1, player2, currentPlayer, currentSymbol;
         currentPlayer = player1;
         currentSymbol = "X";
       }
-      document.getElementById("message").innerText = `${currentPlayer}, you're up`;
+      document.querySelector(".message").innerText = `${currentPlayer}, you're up`;
     }
 
     function checkWinner() {
