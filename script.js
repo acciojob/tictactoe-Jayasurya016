@@ -1,5 +1,5 @@
-const player1Input = document.getElementById('player-1');
-const player2Input = document.getElementById('player-2');
+const player1Input = document.getElementById('player1');
+const player2Input = document.getElementById('player2');
 const submitBtn = document.getElementById('submit');
 const setupDiv = document.querySelector('.setup');
 const gameDiv = document.querySelector('.game');
@@ -42,12 +42,12 @@ function createBoard() {
 function handleMove(index, cell) {
   if (boardState[index] || gameOver) return;
 
-  const symbol = currentPlayer === 0 ? 'X' : 'O';
+  const symbol = currentPlayer === 0 ? 'x' : 'o';
   boardState[index] = symbol;
   cell.textContent = symbol;
 
   if (checkWin(symbol)) {
-    messageDiv.textContent = `${players[currentPlayer]}, congratulations you won!`;
+    messageDiv.textContent = `${players[currentPlayer]} congratulations you won!`;
     gameOver = true;
   } else if (boardState.every(cell => cell)) {
     messageDiv.textContent = `It's a draw!`;
